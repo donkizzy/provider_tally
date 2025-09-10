@@ -1,23 +1,23 @@
 class BusinessModel {
-  final String? bizName;
-  final String? bssLocation;
-  final String? contactNo;
+  final String? businessName;
+  final String? businessLocation;
+  final String? contactNumber;
 
   BusinessModel({
-    this.bizName,
-    this.bssLocation,
-    this.contactNo,
+    this.businessName,
+    this.businessLocation,
+    this.contactNumber,
   });
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) => BusinessModel(
-    bizName: json["biz_name"],
-    bssLocation: json["bss_location"],
-    contactNo: json["contct_no"],
+    businessName: json["biz_name"],
+    businessLocation: json["bss_location"],
+    contactNumber: json["contct_no"],
   );
 
   Map<String, dynamic> toJson() => {
-    "biz_name": bizName,
-    "bss_location": bssLocation,
-    "contct_no": contactNo,
+    "biz_name": businessName,
+    "bss_location": businessLocation,
+    "contct_no": contactNumber,
   };
 }
