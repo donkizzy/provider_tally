@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider_sample/models/business_model.dart';
 import 'package:provider_sample/repositories/business_repository.dart';
@@ -20,9 +21,10 @@ class BusinessProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
 
 
-  BusinessProvider({required BusinessRepository repository, required SharedPreferences prefs}){
-    _repository = repository;
-    _prefs = prefs ;
+  BusinessProvider([BusinessRepository? repository, SharedPreferences? prefs]){
+    _prefs =  prefs ?? _prefs ;
+    _repository = repository ?? BusinessRepository(dio: Dio(), prefs: _prefs);
+
   }
 
   Future<void> fetchBusinesses() async {
