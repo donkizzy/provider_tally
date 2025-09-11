@@ -3,16 +3,17 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:dio/dio.dart';
 import 'package:provider_sample/models/business_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider_sample/repositories/storage_manager.dart';
 
 class BusinessRepository {
   late Dio _dio;
-  late SharedPreferences _preferences ;
-  static const String _businessCacheKey = 'business_data_cache';
+  late StorageManager _storageManager ;
 
-  BusinessRepository({required Dio dio, required SharedPreferences prefs}){
-    _preferences = prefs;
+
+  BusinessRepository({required Dio dio, required StorageManager storageManager}) {
+    _storageManager = storageManager;
     _dio = dio;
+    _storageManager.init();
   }
 
   Future<List<BusinessModel>> fetchBusinesses() async {
@@ -21,7 +22,8 @@ class BusinessRepository {
     List<BusinessModel> businessModelFromJson = List<BusinessModel>.from(
       jsonDecode(jsonString).map((x) => BusinessModel.fromJson(x)),
     );
-    await _preferences.setString(_businessCacheKey, jsonString);
+
+    await _storageManager.setString(_storageManager.businessCacheKey, jsonString);
     return businessModelFromJson;
   }
 }

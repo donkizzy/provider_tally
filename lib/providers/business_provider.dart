@@ -2,14 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider_sample/models/business_model.dart';
 import 'package:provider_sample/repositories/business_repository.dart';
+import 'package:provider_sample/repositories/storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ViewState { idle, loading, success, error }
+enum ViewState { idle, loading, success, error, empty }
 
 class BusinessProvider with ChangeNotifier {
-
   late BusinessRepository _repository;
-  late SharedPreferences _prefs;
+  late StorageManager _storageManager;
   ViewState _state = ViewState.idle;
   List<BusinessModel> _businesses = [];
 
@@ -20,11 +20,9 @@ class BusinessProvider with ChangeNotifier {
 
   String get errorMessage => _errorMessage;
 
-
-  BusinessProvider([BusinessRepository? repository, SharedPreferences? prefs]){
-    _prefs =  prefs ?? _prefs ;
-    _repository = repository ?? BusinessRepository(dio: Dio(), prefs: _prefs);
-
+  BusinessProvider([BusinessRepository? repository, StorageManager? storageManager]) {
+    _storageManager = storageManager ?? StorageManager();
+    _repository = repository ?? BusinessRepository(dio: Dio(), storageManager: _storageManager);
   }
 
   Future<void> fetchBusinesses() async {
@@ -33,13 +31,15 @@ class BusinessProvider with ChangeNotifier {
     try {
       final businessList = await _repository.fetchBusinesses();
       _businesses = businessList;
-      _state = ViewState.success;
+      if (_businesses.isEmpty) {
+        _state = ViewState.empty;
+      } else {
+        _state = ViewState.success;
+      }
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       _state = ViewState.error;
     }
     notifyListeners();
   }
-
-
 }
