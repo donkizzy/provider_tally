@@ -34,7 +34,7 @@ class _HomePageScreenState extends State<HomePage> {
         builder: (context, provider, child) {
           switch (provider.state) {
             case ViewState.loading:
-              return Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)));
+              return Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator(strokeWidth: 2)));
 
             case ViewState.success:
               return BusinessList<BusinessModel>(options: provider.businesses);

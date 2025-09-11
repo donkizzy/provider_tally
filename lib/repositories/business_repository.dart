@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -13,7 +15,6 @@ class BusinessRepository {
   BusinessRepository({required Dio dio, required StorageManager storageManager}) {
     _storageManager = storageManager;
     _dio = dio;
-    _storageManager.init();
   }
 
   Future<List<BusinessModel>> fetchBusinesses() async {

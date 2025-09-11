@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider_sample/models/business_model.dart';
 import 'package:provider_sample/repositories/business_repository.dart';
 import 'package:provider_sample/repositories/storage_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum ViewState { idle, loading, success, error, empty }
 
@@ -23,18 +24,29 @@ class BusinessProvider with ChangeNotifier {
   BusinessProvider([BusinessRepository? repository, StorageManager? storageManager]) {
     _storageManager = storageManager ?? StorageManager();
     _repository = repository ?? BusinessRepository(dio: Dio(), storageManager: _storageManager);
+
   }
 
   Future<void> fetchBusinesses() async {
     _state = ViewState.loading;
     notifyListeners();
     try {
-      final businessList = await _repository.fetchBusinesses();
-      _businesses = businessList;
-      if (_businesses.isEmpty) {
-        _state = ViewState.empty;
-      } else {
+     await _storageManager.init();
+      var cacheData = _storageManager.getString(_storageManager.businessCacheKey);
+      if (cacheData != null && cacheData.isNotEmpty) {
+        List<BusinessModel>  businesses = List<BusinessModel>.from(
+          (jsonDecode(cacheData) as List).map((x) => BusinessModel.fromJson(x)),
+        );
         _state = ViewState.success;
+        _businesses = businesses;
+      } else {
+        final businessList = await _repository.fetchBusinesses();
+        _businesses = businessList;
+        if (_businesses.isEmpty) {
+          _state = ViewState.empty;
+        } else {
+          _state = ViewState.success;
+        }
       }
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
